@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <bytecodeTargetLevel target="1.7">
+      <module name="Runique.app" target="21" />
+      <module name="Runique.auth.data" target="21" />
+      <module name="Runique.auth.presentation" target="21" />
+      <module name="Runique.core.data" target="21" />
+      <module name="Runique.core.database" target="21" />
+      <module name="Runique.core.presentation.designsystem" target="21" />
+      <module name="Runique.core.presentation.ui" target="21" />
+      <module name="Runique.run.data" target="21" />
+      <module name="Runique.run.location" target="21" />
+      <module name="Runique.run.network" target="21" />
+      <module name="Runique.run.presentation" target="21" />
+    </bytecodeTargetLevel>
+  </component>
+</project>
