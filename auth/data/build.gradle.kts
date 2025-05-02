@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    namespace = "com.plcoding.auth.data"
+    namespace = "dev.abhinav.auth.data"
     compileSdk = 35
 
     defaultConfig {

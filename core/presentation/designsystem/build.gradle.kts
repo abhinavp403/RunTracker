@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    namespace = "com.plcoding.core.presentation.designsystem"
+    namespace = "dev.abhinav.core.presentation.designsystem"
     compileSdk = 35
 
     defaultConfig {

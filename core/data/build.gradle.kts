@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    namespace = "com.plcoding.core.data"
+    namespace = "dev.abhinav.core.data"
     compileSdk = 35
 
     defaultConfig {

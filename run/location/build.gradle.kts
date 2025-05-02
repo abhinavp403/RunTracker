@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    namespace = "com.plcoding.run.location"
+    namespace = "dev.abhinav.run.location"
     compileSdk = 35
 
     defaultConfig {

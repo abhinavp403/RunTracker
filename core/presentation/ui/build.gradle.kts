@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    namespace = "com.plcoding.core.presentation.ui"
+    namespace = "dev.abhinav.core.presentation.ui"
     compileSdk = 35
 
     defaultConfig {

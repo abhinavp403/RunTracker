@@ -3,7 +3,7 @@ plugins {
     `kotlin-dsl`
 }
 
-group = "com.plcoding.runique.buildlogic"
+group = "dev.abhinav.runtracker.buildlogic"
 
 dependencies {
     compileOnly(libs.android.gradlePlugin)
