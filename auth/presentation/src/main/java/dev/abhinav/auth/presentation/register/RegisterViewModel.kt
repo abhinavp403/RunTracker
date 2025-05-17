@@ -26,8 +26,10 @@ class RegisterViewModel(
             .debounce(400)
             .distinctUntilChanged()
             .onEach { email ->
+                val isValidEmail = userDataValidator.isValidEmail(email)
                 state = state.copy(
-                    isEmailValid = userDataValidator.isValidEmail(email.toString())
+                    isEmailValid = isValidEmail,
+                    canRegister = isValidEmail && state.passwordValidationState.isValidPassword && !state.isRegistering
                 )
             }
             .launchIn(viewModelScope)
@@ -36,8 +38,10 @@ class RegisterViewModel(
             .debounce(400)
             .distinctUntilChanged()
             .onEach { password ->
+                val passwordValidationState = userDataValidator.validatePassword(password)
                 state = state.copy(
-                    passwordValidationState = userDataValidator.validatePassword(password.toString())
+                    passwordValidationState = passwordValidationState,
+                    canRegister = state.isEmailValid && passwordValidationState.isValidPassword && !state.isRegistering
                 )
             }
             .launchIn(viewModelScope)
