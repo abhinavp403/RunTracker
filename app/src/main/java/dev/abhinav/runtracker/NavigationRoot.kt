@@ -1,5 +1,6 @@
 package dev.abhinav.runtracker
 
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
@@ -50,6 +51,11 @@ private fun NavGraphBuilder.authGraph(navController: NavHostController) {
                 onSuccessfulRegistration = {
                     navController.navigate("login")
                 }
+            )
+        }
+        composable(route = "login") {
+            Text(
+                text = "Login Screen"
             )
         }
     }
