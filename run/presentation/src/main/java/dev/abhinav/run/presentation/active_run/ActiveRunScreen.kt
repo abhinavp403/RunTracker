@@ -33,6 +33,7 @@ import dev.abhinav.core.presentation.designsystem.components.RuntrackerScaffold
 import dev.abhinav.core.presentation.designsystem.components.RuntrackerToolbar
 import dev.abhinav.run.presentation.R
 import dev.abhinav.run.presentation.active_run.components.RunDataCard
+import dev.abhinav.run.presentation.active_run.maps.TrackerMap
 import dev.abhinav.run.presentation.util.hasLocationPermission
 import dev.abhinav.run.presentation.util.hasNotificationPermission
 import dev.abhinav.run.presentation.util.shouldShowLocationPermissionRationale
@@ -141,6 +142,15 @@ private fun ActiveRunScreen(
                 .fillMaxSize()
                 .background(MaterialTheme.colorScheme.surface)
         ) {
+            TrackerMap(
+                isRunFinished = state.isRunFinished,
+                currentLocation = state.currentLocation,
+                locations = state.runData.locations,
+                onSnapshot = {},
+                modifier = Modifier
+                    .fillMaxSize()
+            )
+
             RunDataCard(
                 elapsedTime = state.elapsedTime,
                 runData = state.runData,
