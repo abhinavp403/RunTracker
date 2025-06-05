@@ -26,6 +26,7 @@ import androidx.compose.ui.unit.dp
 import dev.abhinav.core.presentation.designsystem.RuntrackerTheme
 import dev.abhinav.core.presentation.designsystem.StartIcon
 import dev.abhinav.core.presentation.designsystem.StopIcon
+import dev.abhinav.core.presentation.designsystem.components.RuntrackerActionButton
 import dev.abhinav.core.presentation.designsystem.components.RuntrackerDialog
 import dev.abhinav.core.presentation.designsystem.components.RuntrackerFloatingActionButton
 import dev.abhinav.core.presentation.designsystem.components.RuntrackerOutlinedActionButton
@@ -160,6 +161,36 @@ private fun ActiveRunScreen(
                     .fillMaxWidth()
             )
         }
+    }
+
+    if (!state.shouldTrack && state.hasStartedRunning) {
+        RuntrackerDialog(
+            title = stringResource(id = R.string.running_is_paused),
+            onDismiss = {
+                onAction(ActiveRunAction.OnResumeRunClick)
+            },
+            description = stringResource(id = R.string.resume_or_finish_run),
+            primaryButton = {
+                RuntrackerActionButton(
+                    text = stringResource(id = R.string.resume),
+                    isLoading = false,
+                    onClick = {
+                        onAction(ActiveRunAction.OnResumeRunClick)
+                    },
+                    modifier = Modifier.weight(1f)
+                )
+            },
+            secondaryButton = {
+                RuntrackerOutlinedActionButton(
+                    text = stringResource(id = R.string.finish),
+                    isLoading = state.isSavingRun,
+                    onClick = {
+                        onAction(ActiveRunAction.OnFinishRunClick)
+                    },
+                    modifier = Modifier.weight(1f)
+                )
+            }
+        )
     }
 
     if (state.showLocationRationale || state.showNotificationRationale) {
