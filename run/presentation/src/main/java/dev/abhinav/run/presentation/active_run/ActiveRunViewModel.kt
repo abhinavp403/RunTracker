@@ -8,6 +8,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dev.abhinav.core.domain.location.Location
 import dev.abhinav.core.domain.run.Run
+import dev.abhinav.core.domain.run.RunRepository
+import dev.abhinav.core.domain.util.Result
+import dev.abhinav.core.presentation.ui.asUiText
 import dev.abhinav.run.domain.LocationDataCalculator
 import dev.abhinav.run.domain.RunningTracker
 import dev.abhinav.run.presentation.active_run.service.ActiveRunService
@@ -19,17 +22,20 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 import java.time.ZoneId
 import java.time.ZonedDateTime
 
 class ActiveRunViewModel(
-    private val runningTracker: RunningTracker
+    private val runningTracker: RunningTracker,
+    private val runRepository: RunRepository
 ) : ViewModel() {
 
     var state by mutableStateOf(ActiveRunState(
         shouldTrack = ActiveRunService.isServiceActive && runningTracker.isTracking.value,
         hasStartedRunning = ActiveRunService.isServiceActive
     ))
+        private set
 
     private val eventChannel = Channel<ActiveRunEvent>()
     val events = eventChannel.receiveAsFlow()
@@ -38,12 +44,12 @@ class ActiveRunViewModel(
         .stateIn(viewModelScope, SharingStarted.Lazily, state.shouldTrack)
     private val hasLocationPermission = MutableStateFlow(false)
 
-    private val isTracking = combine (
+    private val isTracking = combine(
         shouldTrack,
         hasLocationPermission
     ) { shouldTrack, hasPermission ->
         shouldTrack && hasPermission
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000L), false)
+    }.stateIn(viewModelScope, SharingStarted.Lazily, false)
 
     init {
         hasLocationPermission
@@ -142,7 +148,7 @@ class ActiveRunViewModel(
             return
         }
 
-        viewModelScope.run {
+        viewModelScope.launch {
             val run = Run(
                 id = null,
                 duration = state.elapsedTime,
@@ -155,9 +161,17 @@ class ActiveRunViewModel(
                 mapPictureUrl = null
             )
 
-            // Save run in repository
-
             runningTracker.finishRun()
+
+            when (val result = runRepository.upsertRun(run, mapPictureBytes)) {
+                is Result.Success -> {
+                    eventChannel.send(ActiveRunEvent.RunSaved)
+                }
+                is Result.Error -> {
+                    eventChannel.send(ActiveRunEvent.Error(result.error.asUiText()))
+                }
+            }
+
             state = state.copy(isSavingRun = false)
         }
     }

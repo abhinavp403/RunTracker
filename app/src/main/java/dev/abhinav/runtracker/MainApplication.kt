@@ -7,6 +7,7 @@ import dev.abhinav.auth.presentation.di.authViewModelModule
 import dev.abhinav.core.data.di.coreDataModule
 import dev.abhinav.core.database.di.databaseModule
 import dev.abhinav.run.location.di.locationModule
+import dev.abhinav.run.network.di.networkModule
 import dev.abhinav.run.presentation.di.runPresentationModule
 import dev.abhinav.runtracker.di.appModule
 import kotlinx.coroutines.CoroutineScope
@@ -37,7 +38,8 @@ class MainApplication : Application() {
                 coreDataModule,
                 runPresentationModule,
                 locationModule,
-                databaseModule
+                databaseModule,
+                networkModule
             )
         }
     }
