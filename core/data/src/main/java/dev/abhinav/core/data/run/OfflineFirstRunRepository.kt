@@ -8,6 +8,7 @@ import dev.abhinav.core.domain.run.RemoteRunDataSource
 import dev.abhinav.core.domain.run.Run
 import dev.abhinav.core.domain.run.RunId
 import dev.abhinav.core.domain.run.RunRepository
+import dev.abhinav.core.domain.run.SyncRunScheduler
 import dev.abhinav.core.domain.util.DataError
 import dev.abhinav.core.domain.util.EmptyResult
 import dev.abhinav.core.domain.util.Result
@@ -24,7 +25,8 @@ class OfflineFirstRunRepository(
     private val remoteRunDataSource: RemoteRunDataSource,
     private val applicationScope: CoroutineScope,
     private val runPendingSyncDao: RunPendingSyncDao,
-    private val sessionStorage: SessionStorage
+    private val sessionStorage: SessionStorage,
+    private val syncRunScheduler: SyncRunScheduler
 ) : RunRepository {
     override fun getRuns(): Flow<List<Run>> {
         return localRunDataSource.getRuns()
@@ -62,6 +64,14 @@ class OfflineFirstRunRepository(
                 }.await()
             }
             is Result.Error -> {
+                applicationScope.launch {
+                    syncRunScheduler.scheduleSync(
+                        type = SyncRunScheduler.SyncRun.CreateRun(
+                            run = runWithId,
+                            mapPictureBytes = mapPicture
+                        )
+                    )
+                }.join()
                 Result.Success(Unit)
             }
         }
@@ -82,6 +92,14 @@ class OfflineFirstRunRepository(
         val remoteResult = applicationScope.async {
             remoteRunDataSource.deleteRun(id)
         }.await()
+
+        if (remoteResult is Result.Error) {
+            applicationScope.launch {
+                syncRunScheduler.scheduleSync(
+                    type = SyncRunScheduler.SyncRun.DeleteRun(id)
+                )
+            }.join()
+        }
     }
 
     override suspend fun syncPendingRuns() {
@@ -112,11 +130,10 @@ class OfflineFirstRunRepository(
                     }
                 }
 
-            val deleteJobs = createdRuns
+            val deleteJobs = deletedRuns
                 .await()
                 .map {
                     launch {
-                        val run = it.run.toRun()
                         when (remoteRunDataSource.deleteRun(it.runId)) {
                             is Result.Success -> {
                                 applicationScope.launch {
