@@ -1,5 +1,6 @@
 package dev.abhinav.core.data.run
 
+import dev.abhinav.core.data.networking.get
 import dev.abhinav.core.database.dao.RunPendingSyncDao
 import dev.abhinav.core.database.mappers.toRun
 import dev.abhinav.core.domain.SessionStorage
@@ -13,6 +14,10 @@ import dev.abhinav.core.domain.util.DataError
 import dev.abhinav.core.domain.util.EmptyResult
 import dev.abhinav.core.domain.util.Result
 import dev.abhinav.core.domain.util.asEmptyDataResult
+import io.ktor.client.HttpClient
+import io.ktor.client.plugins.auth.Auth
+import io.ktor.client.plugins.auth.providers.BearerAuthProvider
+import io.ktor.client.plugins.plugin
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -26,7 +31,8 @@ class OfflineFirstRunRepository(
     private val applicationScope: CoroutineScope,
     private val runPendingSyncDao: RunPendingSyncDao,
     private val sessionStorage: SessionStorage,
-    private val syncRunScheduler: SyncRunScheduler
+    private val syncRunScheduler: SyncRunScheduler,
+    private val client: HttpClient
 ) : RunRepository {
     override fun getRuns(): Flow<List<Run>> {
         return localRunDataSource.getRuns()
@@ -148,5 +154,21 @@ class OfflineFirstRunRepository(
             createJobs.forEach { it.join() }
             deleteJobs.forEach { it.join() }
         }
+    }
+
+    override suspend fun deleteAllRuns() {
+       localRunDataSource.deleteAllRuns()
+    }
+
+    override suspend fun logout(): EmptyResult<DataError.Network> {
+        val result = client.get<Unit>(
+            route = "/logout",
+        ).asEmptyDataResult()
+
+        client.plugin(Auth).providers.filterIsInstance<BearerAuthProvider>()
+                .firstOrNull()
+            ?.clearToken()
+
+        return result
     }
 }
