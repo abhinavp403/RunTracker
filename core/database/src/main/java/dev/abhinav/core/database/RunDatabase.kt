@@ -3,6 +3,7 @@ package dev.abhinav.core.database
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import dev.abhinav.core.database.dao.RunDao
+import dev.abhinav.core.database.dao.RunPendingSyncDao
 import dev.abhinav.core.database.entity.DeletedRunSyncEntity
 import dev.abhinav.core.database.entity.RunEntity
 import dev.abhinav.core.database.entity.RunPendingSyncEntity
@@ -18,5 +19,5 @@ import dev.abhinav.core.database.entity.RunPendingSyncEntity
 abstract class RunDatabase : RoomDatabase() {
 
     abstract val runDao: RunDao
-    abstract val runPendingSyncEntity: RunPendingSyncEntity
+    abstract val runPendingSyncDao: RunPendingSyncDao
 }

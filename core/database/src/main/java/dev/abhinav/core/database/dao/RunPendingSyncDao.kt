@@ -1,10 +1,12 @@
 package dev.abhinav.core.database.dao
 
+import androidx.room.Dao
 import androidx.room.Query
 import androidx.room.Upsert
 import dev.abhinav.core.database.entity.DeletedRunSyncEntity
 import dev.abhinav.core.database.entity.RunPendingSyncEntity
 
+@Dao
 interface RunPendingSyncDao {
 
     // CREATED RUNS
